@@ -35,6 +35,7 @@ echo [OK] Virtual environment secured.
 
 echo [System] Synchronizing dependencies...
 pip install -r requirements.txt
+python install_pytorch.py
 echo [OK] Dependencies synchronized.
 
 echo ===================================================
