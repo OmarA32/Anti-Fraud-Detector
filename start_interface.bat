@@ -24,19 +24,22 @@ python install_env.py
 echo [OK] Dependencies synchronized.
 
 echo [System] Checking ML models...
-if not exist rf_model.joblib (
+if not exist "weights\rf_model.joblib" (
     echo.
     echo [!] WARNING: AI models missing!
     echo [!] Initiating emergency deep-learning sequence...
     python train_models.py
 ) else (
-    echo [OK] 3-Model Architecture loaded and ready.
+    echo [OK] 3-Model Architecture loaded from weights directory.
 )
 
 echo.
 echo ===================================================
-echo     SYSTEM READY. LAUNCHING SECURE INTERFACE.
+echo     SYSTEM READY. LAUNCHING DUAL SERVERS.
 echo ===================================================
+echo [1/2] Booting MLflow Tracking Dashboard (Background)...
+start /B mlflow ui --port 5000
+echo [2/2] Booting Streamlit Interface...
 echo.
 ping 127.0.0.1 -n 2 > nul
 

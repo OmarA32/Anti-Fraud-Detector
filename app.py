@@ -69,26 +69,26 @@ st.markdown("""
 
 @st.cache_resource
 def load_models_and_stats():
-    if not os.path.exists('rf_model.joblib') or not os.path.exists('pytorch_ae.pth'):
+    if not os.path.exists('weights/rf_model.joblib') or not os.path.exists('weights/pytorch_ae.pth'):
         return None, None, None, None, None, None, None
         
-    preprocessor = joblib.load('preprocessor.joblib')
-    rf_model = joblib.load('rf_model.joblib')
+    preprocessor = joblib.load('weights/preprocessor.joblib')
+    rf_model = joblib.load('weights/rf_model.joblib')
     
     # Load PyTorch Model (input dim is 10 due to OneHotEncoding of 'type' column)
     autoencoder = PyTorchAutoencoder(input_dim=10).to(device)
-    autoencoder.load_state_dict(torch.load('pytorch_ae.pth', weights_only=True, map_location=device))
+    autoencoder.load_state_dict(torch.load('weights/pytorch_ae.pth', weights_only=True, map_location=device))
     autoencoder.eval() # Set to evaluation mode
     
-    iso_forest = joblib.load('iso_forest_model.joblib')
+    iso_forest = joblib.load('weights/iso_forest_model.joblib')
     
-    with open('ae_threshold.txt', 'r') as f:
+    with open('weights/ae_threshold.txt', 'r') as f:
         ae_threshold = float(f.read().strip())
         
     try:
-        with open('db_stats.json', 'r') as f:
+        with open('weights/db_stats.json', 'r') as f:
             db_stats = json.load(f)
-        with open('model_stats.json', 'r') as f:
+        with open('weights/model_stats.json', 'r') as f:
             model_stats = json.load(f)
     except:
         db_stats, model_stats = {}, {}
