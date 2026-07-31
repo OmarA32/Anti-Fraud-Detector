@@ -35,6 +35,16 @@ pip install -r requirements.txt -q
 python install_env.py
 echo [OK] Dependencies synchronized.
 
+echo ===================================================
+echo     BOOTING MLOps TRACKING SERVER
+echo ===================================================
+echo [System] Launching MLflow Dashboard in the background...
+start /B mlflow ui --port 5000 > nul 2>&1
+ping 127.0.0.1 -n 3 > nul
+echo [System] Opening MLflow Dashboard in your browser...
+start http://localhost:5000
+
+echo.
 echo [System] Checking ML models...
 if not exist "weights\rf_model.joblib" (
     echo.
@@ -47,15 +57,8 @@ if not exist "weights\rf_model.joblib" (
 
 echo.
 echo ===================================================
-echo     SYSTEM READY. LAUNCHING DUAL SERVERS.
+echo     SYSTEM READY. LAUNCHING AI INTERFACE.
 echo ===================================================
-echo [1/2] Booting MLflow Tracking Dashboard (Background)...
-start /B mlflow ui --port 5000 > nul 2>&1
-echo [2/2] Booting Streamlit Interface...
-echo.
-ping 127.0.0.1 -n 3 > nul
-
-echo [System] Opening MLflow Dashboard in your browser...
-start http://localhost:5000
+echo [System] Streamlit will now open in your browser...
 
 streamlit run app.py
