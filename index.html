@@ -7,8 +7,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <!-- PyScript -->
-    <link rel="stylesheet" href="https://pyscript.net/releases/2023.05.1/pyscript.css" />
-    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script type="module" src="https://pyscript.net/latest/core.js"></script>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -63,13 +63,13 @@
         </section>
     </main>
 
-    <py-config>
+    <script type="py" config>
         packages = ["scikit-learn", "pandas", "numpy", "joblib"]
         [[fetch]]
         files = ["./fraud_model.joblib"]
-    </py-config>
+    </script>
 
-    <py-script>
+    <script type="py">
         import joblib
         import pandas as pd
         import numpy as np
@@ -143,6 +143,6 @@
         if btn:
             btn.addEventListener("click", create_proxy(predict_transaction))
             
-    </py-script>
+    </script>
 </body>
 </html>
