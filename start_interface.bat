@@ -41,6 +41,9 @@ echo [1/2] Booting MLflow Tracking Dashboard (Background)...
 start /B mlflow ui --port 5000 > nul 2>&1
 echo [2/2] Booting Streamlit Interface...
 echo.
-ping 127.0.0.1 -n 2 > nul
+ping 127.0.0.1 -n 3 > nul
+
+echo [System] Opening MLflow Dashboard in your browser...
+start http://localhost:5000
 
 streamlit run app.py
