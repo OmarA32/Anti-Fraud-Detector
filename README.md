@@ -5,6 +5,9 @@ A complete, production-ready Multi-Model Cybersecurity Dashboard designed to det
 ![PyTorch Autoencoder Engine](assets/pytorch_ae.png)
 *(Demonstrating the PyTorch Deep Learning engine interface)*
 
+![MLflow Tracking Server](assets/mlflow.png)
+*(Live neural network metric tracking via MLflow)*
+
 ## 🚀 Features
 
 - **Automated Data Pipeline**: Silently pulls the massive 500MB+ [Kaggle PaySim Database](https://www.kaggle.com/datasets/sriharshaeedala/financial-fraud-detection-dataset) without requiring API keys or manual downloads.
