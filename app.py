@@ -75,8 +75,8 @@ def load_models_and_stats():
     preprocessor = joblib.load('preprocessor.joblib')
     rf_model = joblib.load('rf_model.joblib')
     
-    # Load PyTorch Model (input dim is 6)
-    autoencoder = PyTorchAutoencoder(input_dim=6).to(device)
+    # Load PyTorch Model (input dim is 10 due to OneHotEncoding of 'type' column)
+    autoencoder = PyTorchAutoencoder(input_dim=10).to(device)
     autoencoder.load_state_dict(torch.load('pytorch_ae.pth', weights_only=True, map_location=device))
     autoencoder.eval() # Set to evaluation mode
     
