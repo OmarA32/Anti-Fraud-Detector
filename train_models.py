@@ -160,6 +160,7 @@ def train_autoencoder_pytorch(X_train, y_train, X_val, y_val):
     epochs = 30
     for epoch in range(epochs):
         model.train()
+        epoch_loss = 0
         for batch_x, batch_y in dataloader:
             batch_x = batch_x.to(device)
             batch_y = batch_y.to(device)
@@ -169,6 +170,9 @@ def train_autoencoder_pytorch(X_train, y_train, X_val, y_val):
             loss = criterion(outputs, batch_y)
             loss.backward()
             optimizer.step()
+            epoch_loss += loss.item()
+            
+        print(f"      -> Epoch [{epoch+1}/{epochs}] | Loss: {epoch_loss/len(dataloader):.6f}", flush=True)
             
     model.eval()
     with torch.no_grad():
