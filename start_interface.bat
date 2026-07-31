@@ -20,6 +20,7 @@ echo [OK] Virtual environment secured.
 
 echo [System] Synchronizing dependencies...
 pip install -r requirements.txt -q
+python install_env.py
 echo [OK] Dependencies synchronized.
 
 echo [System] Checking ML models...

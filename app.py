@@ -10,6 +10,15 @@ import time
 import torch
 import torch.nn as nn
 
+# Hardware Acceleration Setup
+device = torch.device("cpu")
+try:
+    import intel_extension_for_pytorch as ipex
+    if hasattr(torch, "xpu") and torch.xpu.is_available():
+        device = torch.device("xpu")
+except ImportError:
+    pass
+
 # --- PyTorch Autoencoder Architecture ---
 class PyTorchAutoencoder(nn.Module):
     def __init__(self, input_dim):
@@ -67,8 +76,8 @@ def load_models_and_stats():
     rf_model = joblib.load('rf_model.joblib')
     
     # Load PyTorch Model (input dim is 6)
-    autoencoder = PyTorchAutoencoder(input_dim=6)
-    autoencoder.load_state_dict(torch.load('pytorch_ae.pth', weights_only=True))
+    autoencoder = PyTorchAutoencoder(input_dim=6).to(device)
+    autoencoder.load_state_dict(torch.load('pytorch_ae.pth', weights_only=True, map_location=device))
     autoencoder.eval() # Set to evaluation mode
     
     iso_forest = joblib.load('iso_forest_model.joblib')
@@ -173,7 +182,7 @@ with tab1:
                 
             elif "Autoencoder" in model_choice:
                 # PyTorch Inference
-                tensor_X = torch.FloatTensor(X_processed)
+                tensor_X = torch.FloatTensor(X_processed).to(device)
                 with torch.no_grad():
                     recon = autoencoder(tensor_X)
                     mse = torch.mean(torch.pow(tensor_X - recon, 2), dim=1)[0].item()
@@ -213,10 +222,10 @@ with tab2:
                         preds = rf_model.predict(X_batch_processed)
                         results = (preds == 1)
                     elif "Autoencoder" in model_choice:
-                        tensor_X_batch = torch.FloatTensor(X_batch_processed)
+                        tensor_X_batch = torch.FloatTensor(X_batch_processed).to(device)
                         with torch.no_grad():
                             recon = autoencoder(tensor_X_batch)
-                            mses = torch.mean(torch.pow(tensor_X_batch - recon, 2), dim=1).numpy()
+                            mses = torch.mean(torch.pow(tensor_X_batch - recon, 2), dim=1).cpu().numpy()
                         results = mses > ae_threshold
                     elif "Isolation Forest" in model_choice:
                         preds = iso_forest.predict(X_batch_processed)
