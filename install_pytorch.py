@@ -4,8 +4,11 @@ import os
 
 def get_gpu_vendor():
     try:
-        # Use WMIC to query the hardware GPU on Windows
-        output = subprocess.check_output("wmic path win32_VideoController get name", shell=True, text=True)
+        # Use PowerShell Get-CimInstance to query the hardware GPU (wmic is deprecated in Windows 11)
+        output = subprocess.check_output(
+            ['powershell', '-Command', 'Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name'], 
+            text=True
+        )
         output_lower = output.lower()
         
         if "nvidia" in output_lower:
