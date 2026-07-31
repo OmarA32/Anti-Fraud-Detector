@@ -23,6 +23,7 @@ This project employs three distinct AI philosophies to battle financial fraud, w
 1. 🌲 **Random Forest (Supervised Classification)**: Learns from known fraudulent transaction rules and splits data perfectly. Highly accurate. We utilize `class_weight='balanced'` to massively penalize missing fraud.
    - *Image: [Random Forest Engine](assets/random_forest.png)*
 2. 🤖 **PyTorch Autoencoder (Deep Learning)**: A custom PyTorch `nn.Module` neural network trained exclusively on "safe" transactions. It attempts to mathematically reconstruct transactions and flags high "reconstruction errors" as anomalies.
+   - *Image: [PyTorch Autoencoder Engine](assets/pytorch_ae.png)*
 3. 🌲 **Isolation Forest (Tree-Based Anomaly)**: Scalable unsupervised anomaly detection that builds random decision trees to isolate out-of-bounds data quickly.
    - *Image: [Isolation Forest Engine](assets/iso_forest.png)*
 
