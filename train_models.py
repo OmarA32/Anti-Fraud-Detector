@@ -27,11 +27,6 @@ os.makedirs('weights', exist_ok=True)
 
 # Hardware Acceleration Setup
 device = torch.device("cpu")
-try:
-    import intel_extension_for_pytorch as ipex
-except ImportError:
-    pass
-
 if hasattr(torch, "xpu") and torch.xpu.is_available():
     device = torch.device("xpu")
     print("[System] Hardware Acceleration ACTIVE: Intel XPU detected.")

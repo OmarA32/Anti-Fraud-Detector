@@ -39,7 +39,6 @@ def install_pytorch():
             "torch==2.13.0+xpu", 
             "torchvision==0.28.0+xpu", 
             "torchaudio==2.11.0+xpu", 
-            "intel-extension-for-pytorch==2.1.30+xpu",
             "--index-url", "https://download.pytorch.org/whl/xpu"
         ])
         
