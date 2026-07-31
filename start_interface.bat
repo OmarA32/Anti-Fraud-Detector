@@ -38,7 +38,7 @@ echo ===================================================
 echo     SYSTEM READY. LAUNCHING DUAL SERVERS.
 echo ===================================================
 echo [1/2] Booting MLflow Tracking Dashboard (Background)...
-start /B mlflow ui --port 5000
+start /B mlflow ui --port 5000 > nul 2>&1
 echo [2/2] Booting Streamlit Interface...
 echo.
 ping 127.0.0.1 -n 2 > nul
