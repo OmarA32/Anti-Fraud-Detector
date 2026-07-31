@@ -10,11 +10,11 @@ echo [System] Initializing neural pathways...
 echo [System] Checking virtual environment integrity...
 
 :: Check if Conda is installed
-conda --version >nul 2>&1
+call conda --version >nul 2>&1
 if %errorlevel% neq 0 goto :use_venv
 
 echo [System] Conda MLOps environment manager detected!
-conda info --envs | findstr /C:"fraud_env" >nul
+call conda info --envs | findstr /C:"fraud_env" >nul
 if %errorlevel% neq 0 (
     echo [!] Constructing isolated Conda environment 'fraud_env'...
     call conda create -n fraud_env python=3.11 -y >nul
