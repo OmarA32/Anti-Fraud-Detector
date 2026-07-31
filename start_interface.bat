@@ -14,12 +14,11 @@ call conda --version >nul 2>&1
 if %errorlevel% neq 0 goto :use_venv
 
 echo [System] Conda MLOps environment manager detected!
-call conda info --envs | findstr /C:"fraud_env" >nul
-if %errorlevel% neq 0 (
-    echo [!] Constructing isolated Conda environment 'fraud_env'...
-    call conda create -n fraud_env python=3.11 -y
+if not exist "conda_env" (
+    echo [!] Constructing isolated Conda environment locally in ./conda_env ...
+    call conda create --prefix ./conda_env python=3.11 -y
 )
-call conda activate fraud_env
+call conda activate ./conda_env
 echo [OK] Conda environment secured.
 goto :deps
 
