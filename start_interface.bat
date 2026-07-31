@@ -24,10 +24,10 @@ echo [2/3] Checking and installing requirements...
 pip install -r requirements.txt -q
 
 echo.
-:: Check if the model exists. If not, train it.
-if not exist fraud_model.joblib (
-    echo [!] AI model not found. Training the model now, this may take a minute...
-    python train.py
+:: Check if the models exist. If not, train them.
+if not exist rf_model.joblib (
+    echo [!] AI models not found. Training all 3 models now, this may take a minute...
+    python train_models.py
 )
 
 echo.
