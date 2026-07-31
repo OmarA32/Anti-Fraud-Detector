@@ -27,6 +27,11 @@ os.makedirs('weights', exist_ok=True)
 
 # Hardware Acceleration Setup
 device = torch.device("cpu")
+try:
+    import intel_extension_for_pytorch as ipex
+except ImportError:
+    pass
+
 if hasattr(torch, "xpu") and torch.xpu.is_available():
     device = torch.device("xpu")
     print("[System] Hardware Acceleration ACTIVE: Intel XPU detected.")
@@ -230,10 +235,6 @@ def train_autoencoder_pytorch(X_train, y_train, X_val, y_val):
             "fraud_detection_rate": recall * 100,
             "training_time_sec": t_time
         })
-        
-        # Provide input_example so MLflow can trace the graph for pt2 serialization
-        input_example = X_normal_train[:5]
-        mlflow.pytorch.log_model(model, "model", input_example=input_example)
         
         torch.save(model.state_dict(), os.path.join('weights', 'pytorch_ae.pth'))
         with open(os.path.join('weights', 'ae_threshold.txt'), 'w') as f:
