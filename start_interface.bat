@@ -26,7 +26,7 @@ pip install -r requirements.txt -q
 echo.
 :: Check if the model exists. If not, train it.
 if not exist fraud_model.joblib (
-    echo [!] AI model not found. Training the model now (this may take a minute)...
+    echo [!] AI model not found. Training the model now, this may take a minute...
     python train.py
 )
 
