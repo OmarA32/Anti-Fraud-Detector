@@ -70,7 +70,7 @@ st.markdown("""
 @st.cache_resource
 def load_models_and_stats():
     if not os.path.exists('weights/rf_model.joblib') or not os.path.exists('weights/pytorch_ae.pth'):
-        return None, None, None, None, None, None, None
+        raise FileNotFoundError("Models are currently training. Please wait and refresh!")
         
     preprocessor = joblib.load('weights/preprocessor.joblib')
     rf_model = joblib.load('weights/rf_model.joblib')
@@ -95,9 +95,9 @@ def load_models_and_stats():
         
     return preprocessor, rf_model, autoencoder, ae_threshold, iso_forest, db_stats, model_stats
 
-preprocessor, rf_model, autoencoder, ae_threshold, iso_forest, db_stats, model_stats = load_models_and_stats()
-
-if preprocessor is None:
+try:
+    preprocessor, rf_model, autoencoder, ae_threshold, iso_forest, db_stats, model_stats = load_models_and_stats()
+except FileNotFoundError:
     st.error("🚀 Training in progress! Please wait for the script to finish and refresh the page.")
     st.stop()
 
