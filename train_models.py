@@ -158,7 +158,7 @@ def train_autoencoder_pytorch(X_train, y_train, X_val, y_val):
     
     with mlflow.start_run(run_name="PyTorch_Autoencoder"):
         batch_size = 8192
-        epochs = 30
+        epochs = 5
         lr = 0.005
         
         mlflow.log_params({
