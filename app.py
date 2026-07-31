@@ -77,9 +77,13 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("📊 Database Intelligence")
     if db_stats:
+        # Format the huge numbers so they don't get cut off!
+        total_rec_formatted = f"{db_stats['total_transactions'] / 1000000:.2f}M"
+        total_fraud_formatted = f"{db_stats['total_fraud']:,}"
+        
         col1, col2 = st.columns(2)
-        col1.metric("Total Records", f"{db_stats['total_transactions']:,}")
-        col2.metric("Total Fraud", f"{db_stats['total_fraud']:,}")
+        col1.metric("Total Records", total_rec_formatted)
+        col2.metric("Total Fraud", total_fraud_formatted)
         st.metric("Dataset Fraud Rate", f"{db_stats['fraud_percentage']}%")
         
     st.markdown("---")
@@ -103,19 +107,19 @@ st.markdown("Execute deep-packet inspection of financial transactions using stat
 tab1, tab2 = st.tabs(["💳 Manual Single Scan", "📁 CSV Batch Processing"])
 
 with tab1:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Run a deep scan on a single transaction")
     
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        txn_type = st.selectbox("Type", ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"])
-        amount = st.number_input("Amount ($)", min_value=0.0, value=1500.0)
-    with col2:
-        oldbalanceOrg = st.number_input("Sender Old Balance", min_value=0.0, value=3000.0)
-        newbalanceOrig = st.number_input("Sender New Balance", min_value=0.0, value=1500.0)
-    with col3:
-        oldbalanceDest = st.number_input("Recipient Old Balance", min_value=0.0, value=0.0)
-        newbalanceDest = st.number_input("Recipient New Balance", min_value=0.0, value=1500.0)
+    with st.container(border=True):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            txn_type = st.selectbox("Type", ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"])
+            amount = st.number_input("Amount ($)", min_value=0.0, value=1500.0)
+        with col2:
+            oldbalanceOrg = st.number_input("Sender Old Balance", min_value=0.0, value=3000.0)
+            newbalanceOrig = st.number_input("Sender New Balance", min_value=0.0, value=1500.0)
+        with col3:
+            oldbalanceDest = st.number_input("Recipient Old Balance", min_value=0.0, value=0.0)
+            newbalanceDest = st.number_input("Recipient New Balance", min_value=0.0, value=1500.0)
 
     if st.button("🔍 Execute Deep Scan", type="primary", use_container_width=True):
         input_data = pd.DataFrame([{
@@ -156,42 +160,40 @@ with tab1:
             else:
                 st.markdown(f'<p class="success-text">✅ VERIFIED: TRANSACTION SECURED</p>', unsafe_allow_html=True)
                 st.success(msg)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 with tab2:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Mass Transaction Inspection")
-    uploaded_file = st.file_uploader("Upload PaySim CSV dataset segment", type="csv")
-    
-    if uploaded_file is not None:
-        batch_df = pd.read_csv(uploaded_file)
-        st.write(f"Loaded {len(batch_df):,} transactions for inspection.")
+    with st.container(border=True):
+        uploaded_file = st.file_uploader("Upload PaySim CSV dataset segment", type="csv")
         
-        if st.button("Initiate Grid Scan", type="primary"):
-            with st.spinner("Analyzing mass batch for anomalies..."):
-                time.sleep(1.5)
-                X_batch_processed = preprocessor.transform(batch_df)
-                
-                if "Random Forest" in model_choice:
-                    preds = rf_model.predict(X_batch_processed)
-                    results = (preds == 1)
-                elif "Autoencoder" in model_choice:
-                    recon = autoencoder.predict(X_batch_processed)
-                    mses = np.mean(np.power(X_batch_processed - recon, 2), axis=1)
-                    results = mses > ae_threshold
-                elif "Isolation Forest" in model_choice:
-                    preds = iso_forest.predict(X_batch_processed)
-                    results = (preds == -1)
-                
-                batch_df['AI_Flag'] = ['Fraud' if r else 'Normal' for r in results]
-                fraud_count = sum(results)
-                
-                c1, c2 = st.columns(2)
-                c1.metric("🚨 Total Threats Detected", f"{fraud_count:,}")
-                c2.metric("✅ Cleared Transactions", f"{len(batch_df) - fraud_count:,}")
-                
-                st.markdown("### Threat Topography Map")
-                st.markdown("Visualizing Transaction Amount vs. Sender Balance")
-                # Scatter chart coloring by our AI_Flag
-                st.scatter_chart(data=batch_df, x='oldbalanceOrg', y='amount', color='AI_Flag', height=400)
-    st.markdown('</div>', unsafe_allow_html=True)
+        if uploaded_file is not None:
+            batch_df = pd.read_csv(uploaded_file)
+            st.write(f"Loaded {len(batch_df):,} transactions for inspection.")
+            
+            if st.button("Initiate Grid Scan", type="primary"):
+                with st.spinner("Analyzing mass batch for anomalies..."):
+                    time.sleep(1.5)
+                    X_batch_processed = preprocessor.transform(batch_df)
+                    
+                    if "Random Forest" in model_choice:
+                        preds = rf_model.predict(X_batch_processed)
+                        results = (preds == 1)
+                    elif "Autoencoder" in model_choice:
+                        recon = autoencoder.predict(X_batch_processed)
+                        mses = np.mean(np.power(X_batch_processed - recon, 2), axis=1)
+                        results = mses > ae_threshold
+                    elif "Isolation Forest" in model_choice:
+                        preds = iso_forest.predict(X_batch_processed)
+                        results = (preds == -1)
+                    
+                    batch_df['AI_Flag'] = ['Fraud' if r else 'Normal' for r in results]
+                    fraud_count = sum(results)
+                    
+                    c1, c2 = st.columns(2)
+                    c1.metric("🚨 Total Threats Detected", f"{fraud_count:,}")
+                    c2.metric("✅ Cleared Transactions", f"{len(batch_df) - fraud_count:,}")
+                    
+                    st.markdown("### Threat Topography Map")
+                    st.markdown("Visualizing Transaction Amount vs. Sender Balance")
+                    # Scatter chart coloring by our AI_Flag
+                    st.scatter_chart(data=batch_df, x='oldbalanceOrg', y='amount', color='AI_Flag', height=400)
