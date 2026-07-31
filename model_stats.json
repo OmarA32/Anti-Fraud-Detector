@@ -1,0 +1,21 @@
+{
+    "rf": {
+        "name": "Random Forest",
+        "training_time_sec": 0.33,
+        "validation_accuracy": 98.85,
+        "fraud_detection_rate": 86.98
+    },
+    "ae": {
+        "name": "Autoencoder",
+        "training_time_sec": 2.21,
+        "validation_accuracy": 95.2,
+        "fraud_detection_rate": 37.98,
+        "threshold": 0.0046
+    },
+    "iso": {
+        "name": "Isolation Forest",
+        "training_time_sec": 0.49,
+        "validation_accuracy": 88.65,
+        "fraud_detection_rate": 21.91
+    }
+}
