@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fraud Sentinel</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- PyScript -->
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <main class="glass-panel">
+        <header>
+            <h1>AI Fraud Sentinel</h1>
+            <p>100% Serverless, In-Browser Machine Learning</p>
+        </header>
+
+        <div id="loading-overlay" class="active">
+            <div class="spinner"></div>
+            <p>Loading AI Model into Browser... (This may take a moment)</p>
+        </div>
+
+        <section class="tester-section" id="tester-section" style="display:none;">
+            <div class="form-container">
+                <h2>Test a Transaction</h2>
+                <div class="input-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="input-amount" value="15.99" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>Time (Seconds since first transaction)</label>
+                    <input type="number" id="input-time" value="0">
+                </div>
+                <div class="input-group">
+                    <label>V1 (PCA Component 1)</label>
+                    <input type="number" id="input-v1" value="0.0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label>V2 (PCA Component 2)</label>
+                    <input type="number" id="input-v2" value="0.0" step="0.01">
+                </div>
+                <p class="subtext">Note: V3 through V28 will be auto-filled with 0.0 for this manual test.</p>
+                <button id="predict-btn" class="glow-btn">Predict Fraud</button>
+            </div>
+
+            <div class="result-container" id="result-container">
+                <h2>Result</h2>
+                <div id="result-output" class="result-card hidden">
+                    <div class="status" id="result-status">Normal</div>
+                    <div class="confidence">Confidence: <span id="result-confidence">0%</span></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <py-config>
+        packages = ["scikit-learn", "pandas", "numpy", "joblib"]
+        [[fetch]]
+        files = ["./fraud_model.joblib"]
+    </py-config>
+
+    <py-script>
+        import joblib
+        import pandas as pd
+        import numpy as np
+        from js import document, console
+        from pyodide.ffi import create_proxy
+
+        print("Python initialized. Loading model...")
+        
+        try:
+            model = joblib.load('fraud_model.joblib')
+            expected_features = model.feature_names_in_
+            print("Model loaded successfully!")
+            
+            # Hide loading overlay and show tester
+            document.getElementById("loading-overlay").classList.remove("active")
+            document.getElementById("tester-section").style.display = "flex"
+            
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            document.getElementById("loading-overlay").innerHTML = f"<p>Error loading model: {e}</p>"
+
+        def predict_transaction(event):
+            try:
+                # Read inputs
+                amount = float(document.getElementById("input-amount").value)
+                time = float(document.getElementById("input-time").value)
+                v1 = float(document.getElementById("input-v1").value)
+                v2 = float(document.getElementById("input-v2").value)
+                
+                # Construct dataframe
+                row = {}
+                for f in expected_features:
+                    if f.lower() == 'amount':
+                        row[f] = amount
+                    elif f.lower() == 'time':
+                        row[f] = time
+                    elif f.lower() == 'v1':
+                        row[f] = v1
+                    elif f.lower() == 'v2':
+                        row[f] = v2
+                    else:
+                        row[f] = 0.0
+                
+                df_test = pd.DataFrame([row])
+                
+                # Predict
+                pred = model.predict(df_test)[0]
+                prob = model.predict_proba(df_test)[0]
+                
+                # Update UI
+                res_card = document.getElementById("result-output")
+                res_status = document.getElementById("result-status")
+                res_conf = document.getElementById("result-confidence")
+                
+                res_card.classList.remove("hidden", "normal", "fraud")
+                
+                if pred == 1:
+                    res_status.innerText = "🚨 FRAUD DETECTED"
+                    res_conf.innerText = f"{prob[1]*100:.2f}%"
+                    res_card.classList.add("fraud")
+                else:
+                    res_status.innerText = "✅ NORMAL"
+                    res_conf.innerText = f"{prob[0]*100:.2f}%"
+                    res_card.classList.add("normal")
+                    
+            except Exception as e:
+                console.log(f"Error during prediction: {e}")
+                
+        # Bind event
+        btn = document.getElementById("predict-btn")
+        if btn:
+            btn.addEventListener("click", create_proxy(predict_transaction))
+            
+    </py-script>
+</body>
+</html>
