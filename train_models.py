@@ -27,15 +27,11 @@ os.makedirs('weights', exist_ok=True)
 
 # Hardware Acceleration Setup
 device = torch.device("cpu")
-try:
-    import intel_extension_for_pytorch as ipex
-    if hasattr(torch, "xpu") and torch.xpu.is_available():
-        device = torch.device("xpu")
-        print("[System] Hardware Acceleration ACTIVE: Intel XPU detected.")
-    else:
-        print("[System] Intel XPU not found. Defaulting to CPU.")
-except ImportError:
-    print("[System] intel_extension_for_pytorch not installed. Defaulting to CPU.")
+if hasattr(torch, "xpu") and torch.xpu.is_available():
+    device = torch.device("xpu")
+    print("[System] Hardware Acceleration ACTIVE: Intel XPU detected.")
+else:
+    print("[System] Hardware Acceleration inactive. Defaulting to CPU.")
 
 # Set seeds for reproducibility
 torch.manual_seed(42)
@@ -184,12 +180,6 @@ def train_autoencoder_pytorch(X_train, y_train, X_val, y_val):
         
         optimizer = optim.Adam(model.parameters(), lr=lr)
         criterion = nn.MSELoss()
-        
-        if device.type == "xpu":
-            try:
-                model, optimizer = ipex.optimize(model, optimizer=optimizer)
-            except Exception as e:
-                print(f"[Warning] Failed to apply IPEX optimization: {e}")
         
         # Training Loop with MLflow Metric Logging
         for epoch in range(epochs):
