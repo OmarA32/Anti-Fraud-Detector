@@ -17,7 +17,7 @@ echo [System] Conda MLOps environment manager detected!
 call conda info --envs | findstr /C:"fraud_env" >nul
 if %errorlevel% neq 0 (
     echo [!] Constructing isolated Conda environment 'fraud_env'...
-    call conda create -n fraud_env python=3.11 -y >nul
+    call conda create -n fraud_env python=3.11 -y
 )
 call conda activate fraud_env
 echo [OK] Conda environment secured.
@@ -35,7 +35,7 @@ echo [OK] Virtual environment secured.
 :deps
 
 echo [System] Synchronizing dependencies...
-pip install -r requirements.txt -q
+pip install -r requirements.txt
 echo [OK] Dependencies synchronized.
 
 echo ===================================================
