@@ -14,8 +14,8 @@ A complete, production-ready Multi-Model Cybersecurity Dashboard designed to det
 
 This project employs three distinct AI philosophies to battle financial fraud, which you can hot-swap in real-time from the dashboard:
 
-1. 🌲 **Random Forest (Supervised Classification)**: Learns from known fraudulent transaction rules and splits data perfectly. Highly accurate.
-2. 🤖 **Autoencoder (Deep Learning)**: An unsupervised neural network trained exclusively on "safe" transactions. It attempts to mathematically reconstruct transactions and flags high "reconstruction errors" as anomalies.
+1. 🌲 **Random Forest (Supervised Classification)**: Learns from known fraudulent transaction rules and splits data perfectly. Highly accurate. We utilize `class_weight='balanced'` to massively penalize missing fraud.
+2. 🤖 **PyTorch Autoencoder (Deep Learning)**: A custom PyTorch `nn.Module` neural network trained exclusively on "safe" transactions. It attempts to mathematically reconstruct transactions and flags high "reconstruction errors" as anomalies.
 3. 🌲 **Isolation Forest (Tree-Based Anomaly)**: Scalable unsupervised anomaly detection that builds random decision trees to isolate out-of-bounds data quickly.
 
 ## 📊 Live System Intelligence
@@ -30,9 +30,9 @@ The models are trained locally on a 6.3 Million row financial dataset. Below are
 ### AI Performance Metrics
 | AI Engine | Validation Accuracy | Fraud Detection Rate (Recall) | Training Time |
 | :--- | :--- | :--- | :--- |
-| **Random Forest** | 98.85% | 86.98% | 0.33s |
-| **Autoencoder** | 95.20% | 37.98% | 2.21s |
-| **Isolation Forest** | 88.65% | 21.91% | 0.49s |
+| **Random Forest** | 99.43% | **99.45%** | 0.72s |
+| **PyTorch Autoencoder** | 94.16% | 35.85% | 15.74s |
+| **Isolation Forest** | 82.54% | 34.27% | 0.75s |
 
 *Note: Since fraud is incredibly rare (0.13%), Unsupervised Anomaly Detection models (Autoencoder, Isolation Forest) naturally have lower recall without aggressive threshold tuning, while the Supervised model (Random Forest) excels by learning exactly what fraud looks like.*
 

@@ -6,6 +6,31 @@ import json
 import os
 import time
 
+# PyTorch
+import torch
+import torch.nn as nn
+
+# --- PyTorch Autoencoder Architecture ---
+class PyTorchAutoencoder(nn.Module):
+    def __init__(self, input_dim):
+        super(PyTorchAutoencoder, self).__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 32),
+            nn.ReLU(),
+            nn.Linear(32, 16),
+            nn.ReLU()
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(16, 32),
+            nn.ReLU(),
+            nn.Linear(32, input_dim)
+        )
+        
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
 st.set_page_config(page_title="Fraud Sentinel AI", layout="wide", page_icon="🛡️")
 
 # Custom CSS for glassmorphism and premium aesthetics
@@ -35,12 +60,17 @@ st.markdown("""
 
 @st.cache_resource
 def load_models_and_stats():
-    if not os.path.exists('rf_model.joblib'):
+    if not os.path.exists('rf_model.joblib') or not os.path.exists('pytorch_ae.pth'):
         return None, None, None, None, None, None, None
         
     preprocessor = joblib.load('preprocessor.joblib')
     rf_model = joblib.load('rf_model.joblib')
-    autoencoder = joblib.load('autoencoder.joblib')
+    
+    # Load PyTorch Model (input dim is 6)
+    autoencoder = PyTorchAutoencoder(input_dim=6)
+    autoencoder.load_state_dict(torch.load('pytorch_ae.pth', weights_only=True))
+    autoencoder.eval() # Set to evaluation mode
+    
     iso_forest = joblib.load('iso_forest_model.joblib')
     
     with open('ae_threshold.txt', 'r') as f:
@@ -70,7 +100,7 @@ with st.sidebar:
     st.subheader("🧠 Engine Selection")
     model_choice = st.radio("Active Defense Algorithm:", [
         "🌲 Random Forest (Supervised)",
-        "🤖 Autoencoder (Deep Learning)",
+        "🤖 PyTorch Autoencoder (Deep Learning)",
         "🌲 Isolation Forest (Anomaly)"
     ])
     
@@ -142,8 +172,12 @@ with tab1:
                 msg = f"Random Forest Pattern Match: {'FRAUD' if is_fraud else 'CLEAN'} ({prob:.1f}% Confidence)"
                 
             elif "Autoencoder" in model_choice:
-                recon = autoencoder.predict(X_processed)
-                mse = np.mean(np.power(X_processed - recon, 2), axis=1)[0]
+                # PyTorch Inference
+                tensor_X = torch.FloatTensor(X_processed)
+                with torch.no_grad():
+                    recon = autoencoder(tensor_X)
+                    mse = torch.mean(torch.pow(tensor_X - recon, 2), dim=1)[0].item()
+                
                 is_fraud = (mse > ae_threshold)
                 msg = f"Reconstruction MSE: {mse:.4f} (Threshold: {ae_threshold:.4f}). "
                 msg += "High anomaly score detected." if is_fraud else "Low anomaly score."
@@ -179,8 +213,10 @@ with tab2:
                         preds = rf_model.predict(X_batch_processed)
                         results = (preds == 1)
                     elif "Autoencoder" in model_choice:
-                        recon = autoencoder.predict(X_batch_processed)
-                        mses = np.mean(np.power(X_batch_processed - recon, 2), axis=1)
+                        tensor_X_batch = torch.FloatTensor(X_batch_processed)
+                        with torch.no_grad():
+                            recon = autoencoder(tensor_X_batch)
+                            mses = torch.mean(torch.pow(tensor_X_batch - recon, 2), dim=1).numpy()
                         results = mses > ae_threshold
                     elif "Isolation Forest" in model_choice:
                         preds = iso_forest.predict(X_batch_processed)
