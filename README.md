@@ -9,9 +9,9 @@ A complete, production-ready Multi-Model Cybersecurity Dashboard designed to det
 
 - **Automated Data Pipeline**: Silently pulls the massive 500MB+ [Kaggle PaySim Database](https://www.kaggle.com/datasets/sriharshaeedala/financial-fraud-detection-dataset) without requiring API keys or manual downloads.
 - **Hardware-Aware Neural Engine**: The system dynamically scans your motherboard at install time. It automatically configures itself for **NVIDIA CUDA** or **Intel XPU (Arc)** hardware acceleration, seamlessly falling back to standard CPU if no supported GPU is found.
-- **Live MLOps Tracking**: Fully integrated with **MLflow** for real-time tracking of neural network epochs, validation accuracy, and fraud detection rates during the build sequence.
-- **Deep Packet Inspection UI**: A custom, dark-mode, glassmorphism UI built with Streamlit featuring live AI engine metrics, deep-scan simulations, and threat topography scatter plots.
-- **One-Click Hacker Boot**: The entire system is modularized and launched securely via `start_interface.bat`, handling isolated Conda or Virtual Environments automatically.
+- **Experiment Tracking**: Fully integrated with **MLflow** for real-time tracking of neural network epochs, validation accuracy, and fraud detection rates during the build sequence.
+- **Deep Packet Inspection UI**: A custom, dark-mode, glassmorphism UI built with **Streamlit** featuring live AI engine metrics, deep-scan simulations, and threat topography scatter plots.
+- **Automated Environment Management**: The entire system is modularized and launched securely via `start_interface.bat`. It will automatically construct an isolated **Conda** environment (or fallback to a Python `venv`) so your global system remains untouched.
 
 ## 🧠 3-Model AI Architecture
 
