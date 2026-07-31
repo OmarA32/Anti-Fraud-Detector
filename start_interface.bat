@@ -11,24 +11,28 @@ echo [System] Checking virtual environment integrity...
 
 :: Check if Conda is installed
 conda --version >nul 2>&1
-if %errorlevel% equ 0 (
-    echo [System] Conda MLOps environment manager detected!
-    conda info --envs | findstr /C:"fraud_env" >nul
-    if %errorlevel% neq 0 (
-        echo [!] Constructing isolated Conda environment 'fraud_env'...
-        call conda create -n fraud_env python=3.11 -y >nul
-    )
-    call conda activate fraud_env
-    echo [OK] Conda environment secured.
-) else (
-    echo [System] Conda not found. Falling back to standard Python venv...
-    if not exist "venv" (
-        echo [!] VENV missing. Constructing isolated environment...
-        python -m venv venv
-    )
-    call venv\Scripts\activate
-    echo [OK] Virtual environment secured.
+if %errorlevel% neq 0 goto :use_venv
+
+echo [System] Conda MLOps environment manager detected!
+conda info --envs | findstr /C:"fraud_env" >nul
+if %errorlevel% neq 0 (
+    echo [!] Constructing isolated Conda environment 'fraud_env'...
+    call conda create -n fraud_env python=3.11 -y >nul
 )
+call conda activate fraud_env
+echo [OK] Conda environment secured.
+goto :deps
+
+:use_venv
+echo [System] Conda not found. Falling back to standard Python venv...
+if not exist "venv" (
+    echo [!] VENV missing. Constructing isolated environment...
+    python -m venv venv
+)
+call venv\Scripts\activate
+echo [OK] Virtual environment secured.
+
+:deps
 
 echo [System] Synchronizing dependencies...
 pip install -r requirements.txt -q
